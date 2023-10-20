@@ -1,15 +1,14 @@
 data "aws_availability_zones" "azs" {}
+
 module "myapp-vpc" {
-  source          = "terraform-aws-modules/vpc/aws"
-  version         = "3.19.0"
-  name            = "myapp-vpc"
-  cidr            = var.vpc_cidr_block
-  private_subnets = var.private_subnet_cidr_blocks
-  public_subnets  = var.public_subnet_cidr_blocks
-  azs             = data.aws_availability_zones.azs.names
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.19.0"
+  name    = "myapp-vpc"
+  cidr    = var.vpc_cidr_block
 
   enable_nat_gateway   = true
   single_nat_gateway   = true
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -25,4 +24,9 @@ module "myapp-vpc" {
     "kubernetes.io/cluster/myapp-eks-cluster" = "shared"
     "kubernetes.io/role/internal-elb"         = 1
   }
+
+  azs = data.aws_availability_zones.azs.names
+
+  public_subnets = var.public_subnet_cidr_blocks
+  private_subnets = var.private_subnet_cidr_blocks
 }
